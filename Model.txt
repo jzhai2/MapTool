@@ -1,0 +1,18 @@
+Node {
+	int Node_id
+	int Parent_Node_id
+	String title
+	Collection<HotSpot>
+	String description
+	url Image
+}
+
+HotSpot {
+	int Node_id // node that it points to
+	int HotSopt_id	
+}
+
+Map {
+	
+}
+

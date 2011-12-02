@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<root>
+<item id="root_1" parent_id="0" state="closed">
+<content>
+<name><![CDATA[Node 1]]></name>
+</content>
+</item>
+	<item id="node_2" parent_id="root_1" state="close">
+		<content>
+			<name><![CDATA[Node 2]]></name>
+		</content>
+	</item>
+</root>
