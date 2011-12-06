@@ -49,6 +49,25 @@ input.menuButton {
  border-color:#BBBBBB;
 }
 
+div.theaterMode {
+ background-color: rgba(252, 252, 252, .75);
+ position: fixed;
+ bottom: 0;
+ top: 0;
+ left: 0;
+ right: 0;
+ overflow: auto;
+ z-index: 100;
+}
+
+div.snowbox {
+ background-color: #CCC;
+ position: absolute;
+ left: 25%;
+ top: 25%;
+ z-index: 101;
+}
+
 </style>
 
 <script type="text/javascript">
@@ -89,7 +108,31 @@ $(function() {
 		minHeight: 200
 	}
 	$("#artifact").resizable(a_resize);
-	
+	$("#artifact").bind('resize', function() {
+		var h = $("#artifact_handler").height();
+		var sep = $("#sep").height();
+		var up = $("#up").height();
+		var down = $("#down").height();
+		var ta = $("#textAreaContainer").height();
+		var p = $("#artifact").height();
+		var w = $("#textAreaContainer").width();
+		var total = sep + up + down + ta + h;
+		var t = 100 * (ta - 7) / ta;
+		var tw = 100 * (w - 8) / w;
+		if (p > total) {
+			var downUpdate = 100 * ( down + (p - total) - 2 ) / p;
+			$("#down").text("down = " + downUpdate + "%");
+			$("#textArea").height(t + "%");
+			$("#textArea").width(tw + "%");
+			$("#down").height(downUpdate + "%");
+		} else if (p < total) {
+			var downUpdate = 100 * ( down - (total - p) - 2 ) / p;
+			$("#down").text("down = " + downUpdate + "%");
+			$("#textArea").height(t + "%");
+			$("#textArea").width(tw + "%");
+			$("#down").height(downUpdate + "%");
+		}
+	});
 });
 
 function goLite(n) {
@@ -98,6 +141,21 @@ function goLite(n) {
 
 function goDim(n) {
 	document.getElementById(n).style.backgroundColor = "#AAAAAA";
+}
+
+function theaterOn() {
+	var stagepage = document.createElement('div');
+	stagepage.setAttribute('id', "stagePage");
+	stagepage.setAttribute('class', "snowbox");
+	stagepage.innerHTML = '<iframe width="560" height="345" src="http://www.youtube.com/embed/a2RA0vsZXf8" frameborder="0" allowfullscreen></iframe>';
+	
+	var globalDiv = document.createElement('div');
+	globalDiv.setAttribute('id', "globalDiv");
+	globalDiv.setAttribute('class', "theaterMode");
+	
+	document.body.appendChild(globalDiv);
+	document.getElementById("globalDiv").appendChild(stagepage);
+	
 }
 
 </script>
@@ -121,23 +179,25 @@ function goDim(n) {
 <div id="artifact" class="drsElement"
  style="left: 10px; top: 263px; width: 250px; height: 350px;
  background: #00CC99; text-align: center;">
- <div id="artifact_handler" class="drsMoveHandle" style="text-align: left;">Artifact - </div>
+ <div id="artifact_handler" class="drsMoveHandle" style="text-align: left;">Artifact - 
+ 	<input type="button" id="maximize" class="menuButton" value="M" onMouseOver="goLite(this.id)" onMouseOut="goDim(this.id)"  onclick="theaterOn()"/>
+ </div>
  	<div id="textAreaContainer" style="width:100%; height:20%">
- 	<textarea id="textArea" rows="3" readonly="true" maxlength="1024" style="width:98%; height:100%;" placeholder="Description about this submap..."></textarea>
+ 	<textarea id="textArea" rows="3" readonly="true" maxlength="1024" style="width:97%; height:90%;" placeholder="Description about this submap..."></textarea>
  	</div>
- 	<div id="test1" style="width:100%; height:30%; background:#CCA; overflow:auto;">test1</div>
- 	<div id="sep" style="width:100%; height:2px; background:#00CC99;"></div>
- 	<div id="test2" style="width:100%; height:30%; background:#CCB; overflow:auto;">test2</div>
- 	<div id="Media" style="width:100%"></div>
+ 	<div id="Media" style="width:20%; height:100%; float:left;">Media</div>
+ 	<div id="up" style="width:80%; height:37%; background:#CCA; overflow:auto;">
+ 		<iframe width="560" height="345" src="http://www.youtube.com/embed/a2RA0vsZXf8" frameborder="0" allowfullscreen></iframe>
+ 	</div>
+ 	<div id="sep" style="width:80%; height:2px; background:#00CC99;"></div>
+ 	<div id="down" style="width:80%; height:36.4%; background:#CCB; overflow:auto;">test2</div>
 </div>
 
 <script src="navigator.js"></script>
 <script src="separator.js"></script>
 <script type="text/javascript">
 
-document.getElementById("test2").innerHTML = "height = " + document.getElementById("test2").style.height;
-
-var sp = new Separator('sup', {enable: true, Logdiv: "textUp", Updiv: "test1", Downdiv: "test2", margin: 40});
+var sp = new Separator('sup', {enable: true, Logdiv: "down", Updiv: "up", Downdiv: "down", margin: 40});
 sp.addHandler(document.getElementById("sep"));
 
 </script>
