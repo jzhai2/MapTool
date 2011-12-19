@@ -19,12 +19,12 @@
 
 <title>XML Tree Loader</title>
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
 <script type="text/javascript" src="jquery.jstree.js"></script>
 <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
 <script src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.6/underscore-min.js"></script>
 <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/backbone.js/0.3.3/backbone-min.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
 
 <style type="text/css">
 
@@ -50,7 +50,7 @@ input.menuButton {
 }
 
 div.theaterMode {
- background-color: rgba(252, 252, 252, .75);
+ background-color: rgba(252, 252, 252, .6);
  position: fixed;
  bottom: 0;
  top: 0;
@@ -60,12 +60,73 @@ div.theaterMode {
  z-index: 100;
 }
 
-div.snowbox {
- background-color: #CCC;
- position: absolute;
- left: 25%;
- top: 25%;
+div.wrapper {
+ text-align: center;
+ position: fix;
+ margin-left: 15%;
+ margin-right: 15%;
+ margin-top: 20px;
+ overflow: auto;
  z-index: 101;
+}
+
+div.snowbox {
+ background-color: white;
+ text-align: center;
+ overflow: auto;
+ z-index: 102;
+}
+
+div.mediaDisplay {
+ background-color: #EBECE4;
+ text-align: center;
+ position: relative;
+ margin-left: 10px;
+ margin-right: 10px;
+ margin-top: 10px;
+ overflow: auto;
+ z-index: 103;
+}
+
+div.mediaDescription {
+ background-color: white;
+ text-align: left;
+ position: relative;
+ margin-left: 10px;
+ margin-right: 10px;
+ margin-top: 10px;
+ overflow: auto;
+ z-index: 103;
+}
+
+div.mediaThumbnail {
+ background-color: white;
+ position: relative;
+ margin-left: 5px;
+ margin-right: 5px;
+ margin-top: 70px;
+ overflow: auto;
+ z-index: 102;
+}
+
+div.thumbnail-content {
+	width: 2000px;
+}
+
+div.thumbnail-content-item {
+ width: 100px; 
+ height: 100px;
+ cursor:pointer;
+ background-color: #CCC;
+ float: left; 
+ margin: 10px;
+ font-size: 3em; 
+ line-height: 96px;
+ text-align: center;
+}
+
+div.hilite {
+ background:yellow;
 }
 
 </style>
@@ -133,6 +194,16 @@ $(function() {
 			$("#down").height(downUpdate + "%");
 		}
 	});
+
+	$("div.thumbnail-content-item").click(function () { 
+    	alert('sup'); 
+	});
+
+	$("div.thumbnail-content-item").hover(function () {
+    		$(this).addClass("hilite");
+		}, function () {
+    		$(this).removeClass("hilite");
+	});
 });
 
 function goLite(n) {
@@ -141,21 +212,6 @@ function goLite(n) {
 
 function goDim(n) {
 	document.getElementById(n).style.backgroundColor = "#AAAAAA";
-}
-
-function theaterOn() {
-	var stagepage = document.createElement('div');
-	stagepage.setAttribute('id', "stagePage");
-	stagepage.setAttribute('class', "snowbox");
-	stagepage.innerHTML = '<iframe width="560" height="345" src="http://www.youtube.com/embed/a2RA0vsZXf8" frameborder="0" allowfullscreen></iframe>';
-	
-	var globalDiv = document.createElement('div');
-	globalDiv.setAttribute('id', "globalDiv");
-	globalDiv.setAttribute('class', "theaterMode");
-	
-	document.body.appendChild(globalDiv);
-	document.getElementById("globalDiv").appendChild(stagepage);
-	
 }
 
 </script>
@@ -187,10 +243,41 @@ function theaterOn() {
  	</div>
  	<div id="Media" style="width:20%; height:100%; float:left;">Media</div>
  	<div id="up" style="width:80%; height:37%; background:#CCA; overflow:auto;">
- 		<iframe width="560" height="345" src="http://www.youtube.com/embed/a2RA0vsZXf8" frameborder="0" allowfullscreen></iframe>
+ 		<iframe width="560" height="345" src="http://www.youtube.com/embed/k5kPzmh0I-Q" frameborder="0" allowfullscreen></iframe>
  	</div>
  	<div id="sep" style="width:80%; height:2px; background:#00CC99;"></div>
- 	<div id="down" style="width:80%; height:36.4%; background:#CCB; overflow:auto;">test2</div>
+ 	<div id="down" style="width:80%; height:36.4%; background:#CCB; overflow:auto;">down</div>
+</div>
+
+<div id="background" class="theaterMode">
+<div id="outer_container" class="wrapper">
+	<div id="stagepage" class="snowbox">
+		<div id="media_display" class="mediaDisplay">
+			<iframe width="560" height="345" src="http://www.youtube.com/embed/k5kPzmh0I-Q" frameborder="0" allowfullscreen></iframe>
+		</div>
+		<div id="media_description" class="mediaDescription">
+			<p id="eow-description">Take A Chance On Me' Out 6.11.11. UK &amp; Ireland order from iTunes <a href="http://bit.ly/TACOMiTunes" target="_blank" title="http://bit.ly/TACOMiTunes" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://bit.ly/TACOMiTunes</a> Taken from the album 'Jukebox' out 14.11.11. UK &amp; Ireland order here <a href="http://amzn.to/TakeAChanceAMZ" target="_blank" title="http://amzn.to/TakeAChanceAMZ" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://amzn.to/TakeAChanceAMZ</a><br><br>Music video by JLS performing Take A Chance On Me. (C) 2011 Sony Music Entertainment UK Limited</p>
+		</div>
+	</div>
+	<div di="thumbnail" class="mediaThumbnail">
+	<div class="thumbnail-content">
+		<div class="thumbnail-content-item">1</div>
+		<div class="thumbnail-content-item">2</div>
+		<div class="thumbnail-content-item">3</div>
+		<div class="thumbnail-content-item">4</div>
+		<div class="thumbnail-content-item">5</div>
+		<div class="thumbnail-content-item">6</div>
+		<div class="thumbnail-content-item">7</div>
+		<div class="thumbnail-content-item">8</div>
+		<div class="thumbnail-content-item">9</div>
+		<div class="thumbnail-content-item">10</div>
+		<div class="thumbnail-content-item">11</div>
+		<div class="thumbnail-content-item">12</div>
+		<div class="thumbnail-content-item">13</div>
+	</div>
+	</div>
+</div>
+</div>
 </div>
 
 <script src="navigator.js"></script>
