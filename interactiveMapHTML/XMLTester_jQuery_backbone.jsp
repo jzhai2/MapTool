@@ -116,8 +116,9 @@ div.thumbnail-content {
 div.thumbnail-content-item {
  width: 100px; 
  height: 100px;
- cursor:pointer;
+ cursor: pointer;
  background-color: #CCC;
+ border: 1px solid #CCC;
  float: left; 
  margin: 10px;
  font-size: 3em; 
@@ -125,8 +126,24 @@ div.thumbnail-content-item {
  text-align: center;
 }
 
+div.selecting {
+ background:#FECA40;
+}
+
+div.selected {
+ background:#F39814;
+}
+
 div.hilite {
- background:yellow;
+ border: 1px solid red;
+}
+
+div.thumbnail-prev-button {
+	
+}
+
+div.thumbnail-next-button {
+	
 }
 
 </style>
@@ -195,14 +212,23 @@ $(function() {
 		}
 	});
 
-	$("div.thumbnail-content-item").click(function () { 
-    	alert('sup'); 
+	$("div.thumbnail-content-item").mousedown(function () {
+		$(this).addClass("selecting")
+	}).mouseup(function () {
+		if ($(this).hasClass("selecting")) {
+			$(this).removeClass("selecting");
+			$(this).addClass("selected").siblings().removeClass("selected");
+		}
 	});
 
 	$("div.thumbnail-content-item").hover(function () {
     		$(this).addClass("hilite");
 		}, function () {
     		$(this).removeClass("hilite");
+	});
+
+	$(document).mouseup(function() {
+		$("div.thumbnail-content-item").removeClass("selecting");
 	});
 });
 
