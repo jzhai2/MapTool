@@ -25,6 +25,7 @@
 <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/backbone.js/0.3.3/backbone-min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
+<script src="hoverIntent.js"></script>
 
 <style type="text/css">
 
@@ -48,31 +49,33 @@ input.menuButton {
  border-color:#BBBBBB;
 }
 
-div.Upper-Wrapper {
- height: 610px;
- margin-top: 5px;
- overflow: auto;
-}
-
 table.Table-upper-wrapper {
- height: 100%;
  width: 100%;
+ height: 100%;
  border-spacing: 5px;
  table-layout: fixed;
  overflow: auto;
 }
 
 table.Table-left-wrapper {
- height: 100%;
  width: 100%;
+ height: 100%;
  table-layout: fixed;
  border: none;
  overflow: auto;
 }
 
-table.Table-control-bar {
- height: 100%;
+table.Table-right-wrapper {
  width: 100%;
+ height: 100%;
+ table-layout: fixed;
+ border: none;
+ overflow: auto;
+}
+
+table.Table-lower-wrapper {
+ width: 100%;
+ height: 100%;
  table-layout: fixed;
  overflow: auto;
 }
@@ -82,25 +85,50 @@ td.Left-Inner-Wrapper {
  height: 100%;
  overflow: auto;
  text-align: center;
+ border: 1px solid gray;
+}
+
+td.Right-Inner-Wrapper {
+ width: 27%;
+ height: 100%;
+ overflow: auto;
+ text-align: left;
+ border: 1px solid gray;
 }
 
 td.Description {
- width: 27%;
+ width: 100%;
  height: 100%;
- background-color: #EBECE4;
- border: 1px solid gray;
  overflow: auto;
+ background-color: #EBECE4;
 }
 
 td.Media {
  width: 100%;
+ height: 460px;
  background-color: #EBECE4;
- border: 1px solid gray;
 }
 
 td.Thumbnail {
  width: 100%;
  border-style: none;
+}
+
+td.Lower-Inner-Wrapper {
+ height: 30px;
+ width: 100%;
+ overflow: hidden;
+ border: 1px solid gray;
+}
+
+td.Control-button {
+ height: 100%;
+ width: 60%;
+}
+
+td.Zooming {
+ height: 100%;
+ width: 40%;
 }
 
 div.Description {
@@ -112,16 +140,12 @@ div.Description {
 div.Media {
  overflow: auto;
  width: 100%;
- height: 450px;
+ height: 100%;
 }
 
-div.Control-Bar {
- margin-top: 3px;
- margin-left: 5px;
- margin-right: 5px;
+tr.Control-Bar {
  height: 35px;
  overflow: hidden;
- border: 1px solid black;
 }
 
 div.Zooming-Icon {
@@ -197,6 +221,7 @@ input.groovybutton3 {
    border-width:1px;
    margin-left: 10px;
    position: relative;
+   float: right;
 }
 
 input.hide {
@@ -220,6 +245,9 @@ input.hide {
    border-right-color:#BABABA;
    border-right-width:6px;
    cursor: pointer;
+   position: absolute;
+   top: 7px;
+   z-index: 50;
 }
 
 input.show {
@@ -242,6 +270,11 @@ input.show {
    border-right-style:solid;
    border-right-color:#8A8A8A;
    border-right-width:6px;
+   position: absolute;
+   cursor: pointer;
+   right: 4px;
+   top: 4px;
+   z-index: 50;
 }
 
 #feedback { font-size: 1.4em; }
@@ -287,13 +320,11 @@ $(function() {
 	var a_resize = {
 		autoHide: true,
 		handles: "all",
-		minWidth: 600,
+		minWidth: 660,
 		minHeight: 550,
 		resize: function(event, ui) {
-			var h = ui.size.height - 43;
-			var h2 = h - 135;
-        	$('.Upper-Wrapper').css("height", h+"px");
-        	$('.tr.Media').css("height", h2 + "px");
+        	$("td.Media").height(ui.size.height - 200);
+        	$("td.Left-Inner-Wrapper").height("100%");
     	}
 	}
 	$("#artifact").resizable(a_resize);
@@ -330,6 +361,19 @@ $(function() {
 		}
 	});
 	$( "#amount" ).val( $( ".Zooming-Slider" ).slider( "value" ) );
+
+    hiConfig = {
+        sensitivity: 2, // number = sensitivity threshold (must be 1 or higher)
+        interval: 200, // number = milliseconds for onMouseOver polling interval
+        timeout: 200, // number = milliseconds delay before onMouseOut
+        over: function() {
+            $("#descriptionTD").append('<input type="button" id="hide_button" class="hide" value="  >> Hide" title="" onMouseOver="goLite_hide(this.id)" onMouseOut="goDim_hide(this.id)" onclick="hide()">');
+        }, // function = onMouseOver callback (REQUIRED)
+        out: function() { 
+        	$("#hide_button").remove();
+        } // function = onMouseOut callback (REQUIRED)
+    }
+    $("#descriptionTD").hoverIntent(hiConfig)
 });
 
 function goLite(n) {
@@ -385,15 +429,31 @@ function goDim_show(n) {
 }
 
 function hide() {
-	var mw = $("#upper-wrapper").width() - 15;
-	$("#resizeTD").css("max-Width", mw);
-	$("#resizeTD").animate({
+	var mw = $("table.Table-upper-wrapper").width();
+	$("#hide_button").remove();
+	$("td.Left-Inner-Wrapper").css("max-Width", mw);
+	$("td.Left-Inner-Wrapper").animate({
 			width: mw
 		}, function () {
-			$("#resizeTD").width("100%");
-			$("#descriptionTD").width(0);
-			//TODO append show button
-			$("#resizeTD").append();
+			$("td.Left-Inner-Wrapper").width('100%');
+			$("td.Right-Inner-Wrapper").width('0%');
+			$("div.Media").append('<input type="button" id="show_button" class="show" value=" << Show" title="" onMouseOver="goLite_show(this.id)" onMouseOut="goDim_show(this.id)" onclick="show()">');
+	});
+}
+
+function show() {
+	var w = parseInt($("table.Table-upper-wrapper").width() * 0.73);
+	var mw = parseInt($("table.Table-upper-wrapper").width() * 0.9);
+	$("#show_button").remove();
+	$("td.Left-Inner-Wrapper").css("max-Width", mw); 
+	$("table.Table-left-wrapper").css("border-right", " 1px solid black");
+	$("table.Table-left-wrapper").animate({
+			width: w
+		}, function () {
+			$("table.Table-left-wrapper").css("border-right", "none");
+			$("table.Table-left-wrapper").width('100%');
+			$("td.Left-Inner-Wrapper").width('73%');
+			$("td.Right-Inner-Wrapper").width('27%');
 	});
 }
 
@@ -415,8 +475,7 @@ function hide() {
  	</div>
 </div>
 
-<div id="artifact" class="drsElement" style="left: 270px; top: 7px; width: 800px; height: 660px;">
-	<div id="upper-wrapper" class="Upper-Wrapper">
+<div id="artifact" class="drsElement" style="overflow: hidden; left: 270px; top: 7px; width: 800px; height: 660px;">
 		<table class="Table-upper-wrapper">
 			<tbody>
 				<tr>
@@ -424,7 +483,7 @@ function hide() {
 						<table class="Table-left-wrapper">
 							<tr><td class="Media">
 								<div class="Media">
-								<iframe width="560" height="315" src="http://www.youtube.com/embed/KagvExF-ijc" frameborder="0" allowfullscreen></iframe>
+								<iframe width="560" height="315" src="http://www.youtube.com/embed/JIzw7BHmkN4" frameborder="0" allowfullscreen></iframe>
 								<p>
 									<label for="amount">Zooming amount (10 increments):</label>
 								<input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
@@ -453,34 +512,40 @@ function hide() {
 							</td></tr>
 						</table>
 					</td>
-					<td id="descriptionTD" class="Description">
-						<div class="Description">
-							<input type="button" id="hide_button" class="hide" value="  >> Hide" title="" onMouseOver="goLite_hide(this.id)" onMouseOut="goDim_hide(this.id)" onclick="hide()">
-						</div>
+					<td id="descriptionTD" class="Right-Inner-Wrapper">
+						<table class="Table-right-wrapper">
+							<tr><td class="Description">
+								<div class="Description">
+									<p id="eow-description">Take A Chance On Me' Out 6.11.11. UK &amp; Ireland order from iTunes <a href="http://bit.ly/TACOMiTunes" target="_blank" title="http://bit.ly/TACOMiTunes" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://bit.ly/TACOMiTunes</a> Taken from the album 'Jukebox' out 14.11.11. UK &amp; Ireland order here <a href="http://amzn.to/TakeAChanceAMZ" target="_blank" title="http://amzn.to/TakeAChanceAMZ" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://amzn.to/TakeAChanceAMZ</a><br><br>Music video by JLS performing Take A Chance On Me. (C) 2011 Sony Music Entertainment UK Limited</p>
+									<p id="eow-description">Take A Chance On Me' Out 6.11.11. UK &amp; Ireland order from iTunes <a href="http://bit.ly/TACOMiTunes" target="_blank" title="http://bit.ly/TACOMiTunes" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://bit.ly/TACOMiTunes</a> Taken from the album 'Jukebox' out 14.11.11. UK &amp; Ireland order here <a href="http://amzn.to/TakeAChanceAMZ" target="_blank" title="http://amzn.to/TakeAChanceAMZ" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://amzn.to/TakeAChanceAMZ</a><br><br>Music video by JLS performing Take A Chance On Me. (C) 2011 Sony Music Entertainment UK Limited</p>
+									<p id="eow-description">Take A Chance On Me' Out 6.11.11. UK &amp; Ireland order from iTunes <a href="http://bit.ly/TACOMiTunes" target="_blank" title="http://bit.ly/TACOMiTunes" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://bit.ly/TACOMiTunes</a> Taken from the album 'Jukebox' out 14.11.11. UK &amp; Ireland order here <a href="http://amzn.to/TakeAChanceAMZ" target="_blank" title="http://amzn.to/TakeAChanceAMZ" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://amzn.to/TakeAChanceAMZ</a><br><br>Music video by JLS performing Take A Chance On Me. (C) 2011 Sony Music Entertainment UK Limited</p>
+									<p id="eow-description">Take A Chance On Me' Out 6.11.11. UK &amp; Ireland order from iTunes <a href="http://bit.ly/TACOMiTunes" target="_blank" title="http://bit.ly/TACOMiTunes" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://bit.ly/TACOMiTunes</a> Taken from the album 'Jukebox' out 14.11.11. UK &amp; Ireland order here <a href="http://amzn.to/TakeAChanceAMZ" target="_blank" title="http://amzn.to/TakeAChanceAMZ" rel="nofollow" dir="ltr" class="yt-uix-redirect-link">http://amzn.to/TakeAChanceAMZ</a><br><br>Music video by JLS performing Take A Chance On Me. (C) 2011 Sony Music Entertainment UK Limited</p>
+								</div>
+							</td></tr>
+						</table
 					</td>
 				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="Control-Bar">
-		<table class="Table-control-bar">
-			<tbody>
 				<tr>
-					<td style="width: 50%">
-						<div class="Zooming-Icon">
-							<img src="zoom.png"/>
-						</div>
-						<div class="Zooming-Slider"></div>
-					</td>
-					<td>
-						<input type="button" id="groovybtn1" class="groovybutton1" value="Full Screen" title="" onMouseOver="goLite_groovy(this.id)" onMouseOut="goDim_groovy(this.id)" onClick="location.href='http://axon.cer.jhu.edu:8080/reveal-sandbox-jiefeng/XMLTester_jQuery_backbone.jsp'" value='click here to visit home page'>
-						<input type="button" id="groovybtn2" class="groovybutton2" value="Current Item Info" title="" onMouseOver="goLite_groovy(this.id)" onMouseOut="goDim_groovy(this.id)">
-						<input type="button" id="groovybtn3" class="groovybutton3" value="Edit Items" title="" onMouseOver="goLite_groovy(this.id)" onMouseOut="goDim_groovy(this.id)">
+					<td colspan="2" class="Lower-Inner-Wrapper">
+						<table class="Table-lower-wrapper">
+							<tr>
+								<td class="Zooming">
+									<div class="Zooming-Icon">
+										<img src="zoom.png"/>
+									</div>
+									<div class="Zooming-Slider"></div>
+								</td>
+								<td class="Control-button">
+									<input type="button" id="groovybtn1" class="groovybutton1" value="Full Screen" title="" onMouseOver="goLite_groovy(this.id)" onMouseOut="goDim_groovy(this.id)" onClick="location.href='http://axon.cer.jhu.edu:8080/reveal-sandbox-jiefeng/XMLTester_jQuery_backbone.jsp'" value='click here to visit home page'>
+									<input type="button" id="groovybtn2" class="groovybutton2" value="Current Item Info" title="" onMouseOver="goLite_groovy(this.id)" onMouseOut="goDim_groovy(this.id)">
+									<input type="button" id="groovybtn3" class="groovybutton3" value="Edit Items" title="" onMouseOver="goLite_groovy(this.id)" onMouseOut="goDim_groovy(this.id)">
+								</td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-	<div> 
 </div>
 
 </body>
